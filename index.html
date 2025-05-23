@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBITDA - Dashboard Progetti</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .glass-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .gradient-purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+        
+        .task-completed {
+            animation: completeTask 0.3s ease-in-out;
+        }
+        
+        @keyframes completeTask {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .revenue-update {
+            animation: updateRevenue 0.4s ease-in-out;
+        }
+        
+        @keyframes updateRevenue {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .project-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .project-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .task-item {
+            background: rgba(248, 250, 252, 0.8);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .custom-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981);
+            transition: width 0.5s ease;
+        }
+        
+        .expand-animation {
+            animation: expandSection 0.3s ease-out;
+        }
+        
+        @keyframes expandSection {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            
+            .main-container {
+                border-radius: 12px;
+                padding: 16px !important;
+                margin: 0 !important;
+            }
+            
+            .glass-card {
+                border-radius: 8px;
+                padding: 18px !important;
+            }
+            
+            /* Header responsive */
+            .mobile-header h1 {
+                font-size: 2rem !important;
+                margin-bottom: 12px !important;
+                line-height: 1.2;
+            }
+            
+            .mobile-header p {
+                font-size: 1rem !important;
+                line-height: 1.4;
+            }
+            
+            /* Projects section mobile */
+            .mobile-projects-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch !important;
+            }
+            
+            .mobile-projects-header h2 {
+                font-size: 1.5rem !important;
+                text-align: center;
+                margin-bottom: 0;
+            }
+            
+            .btn-primary {
+                width: 100%;
+                text-align: center;
+                padding: 16px 20px;
+                font-size: 1rem;
+                border-radius: 12px;
+            }
+            
+            /* Project cards mobile - Equilibrato */
+            .project-card {
+                padding: 20px !important;
+                margin-bottom: 16px;
+                border-radius: 12px;
+            }
+            
+            .mobile-project-header {
+                flex-direction: column !important;
+                gap: 20px;
+                align-items: stretch !important;
+            }
+            
+            .mobile-project-header h3 {
+                font-size: 1.25rem !important;
+                line-height: 1.3;
+            }
+            
+            .mobile-project-header p {
+                font-size: 0.95rem !important;
+                line-height: 1.4;
+                margin-bottom: 16px !important;
+            }
+            
+            .mobile-project-actions {
+                justify-content: center !important;
+                gap: 12px;
+                flex-wrap: wrap;
+                margin-top: 16px;
+            }
+            
+            .mobile-project-actions button {
+                padding: 12px !important;
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+                font-size: 1rem;
+            }
+            
+            /* Stats grid mobile */
+            .mobile-stats-grid {
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+                margin-top: 16px !important;
+            }
+            
+            .mobile-stats-grid > div {
+                font-size: 0.85rem !important;
+                padding: 12px;
+                background: rgba(248, 250, 252, 0.8);
+                border-radius: 8px;
+                text-align: center;
+            }
+            
+            .mobile-stats-grid .font-bold {
+                font-size: 1rem !important;
+                margin-top: 4px;
+                display: block;
+            }
+            
+            /* Task items mobile */
+            .mobile-task-item {
+                padding: 16px !important;
+                margin-bottom: 12px;
+            }
+            
+            .mobile-task-actions {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch !important;
+            }
+            
+            .mobile-task-actions .flex:first-child {
+                margin-bottom: 8px;
+            }
+            
+            .mobile-task-actions .px-3 {
+                text-align: center;
+                margin-bottom: 8px;
+                padding: 8px 12px !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .mobile-task-actions button {
+                padding: 8px;
+                border-radius: 8px;
+                align-self: center;
+                min-width: 36px;
+                min-height: 36px;
+            }
+            
+            /* Badge completato mobile */
+            .mobile-project-header .bg-emerald-100 {
+                margin-left: 0 !important;
+                margin-top: 8px;
+                align-self: flex-start;
+                font-size: 0.75rem !important;
+                padding: 4px 8px !important;
+            }
+            
+            /* Analytics cards mobile */
+            .mobile-analytics {
+                gap: 16px !important;
+            }
+            
+            .mobile-analytics .glass-card {
+                padding: 16px !important;
+            }
+            
+            .mobile-analytics .text-3xl {
+                font-size: 1.75rem !important;
+            }
+            
+            .mobile-analytics .text-2xl {
+                font-size: 1.5rem !important;
+            }
+            
+            .mobile-analytics .text-lg {
+                font-size: 1.1rem !important;
+            }
+            
+            .mobile-analytics .text-sm {
+                font-size: 0.85rem !important;
+            }
+            
+            /* Statistics cards grid mobile */
+            .mobile-stats-cards {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 12px !important;
+            }
+            
+            .mobile-stats-cards .glass-card {
+                padding: 16px !important;
+            }
+            
+            .mobile-stats-cards .text-2xl {
+                font-size: 1.5rem !important;
+            }
+            
+            .mobile-stats-cards .text-sm {
+                font-size: 0.8rem !important;
+            }
+            
+            /* Progress bar section mobile */
+            .mobile-analytics .cursor-pointer h3 {
+                font-size: 1rem !important;
+            }
+            
+            .mobile-analytics .cursor-pointer .text-sm {
+                font-size: 0.75rem !important;
+            }
+            
+            /* Modal mobile */
+            .mobile-modal {
+                margin: 16px !important;
+                max-height: calc(100vh - 32px) !important;
+                padding: 20px !important;
+            }
+            
+            .mobile-modal h3 {
+                font-size: 1.5rem !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .mobile-modal input,
+            .mobile-modal textarea {
+                padding: 16px !important;
+                font-size: 1rem !important;
+                border-radius: 12px !important;
+            }
+            
+            .mobile-modal label {
+                font-size: 0.95rem !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .mobile-modal button {
+                padding: 16px 20px !important;
+                font-size: 1rem !important;
+                border-radius: 12px !important;
+            }
+            
+            /* Hide some elements on very small screens */
+            @media (max-width: 480px) {
+                .mobile-hide-small {
+                    display: none !important;
+                }
+                
+                .mobile-project-actions {
+                    flex-wrap: wrap;
+                    gap: 8px;
+                }
+                
+                .mobile-task-item .mobile-task-actions {
+                    gap: 8px;
+                }
+                
+                .mobile-header h1 {
+                    font-size: 1.75rem !important;
+                }
+                
+                .mobile-projects-header h2 {
+                    font-size: 1.25rem !important;
+                }
+                
+                .btn-primary {
+                    padding: 14px 18px;
+                    font-size: 0.95rem;
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container mx-auto max-w-7xl main-container p-8">
+            <!-- Header -->
+            <header class="mb-10 text-center mobile-header">
+                <h1 class="text-4xl font-bold text-gray-800 mb-3">
+                    📊 EBITDA Dashboard
+                </h1>
+                <p class="text-lg text-gray-600">Gestisci i tuoi progetti e monitora il fatturato</p>
+            </header>
+
+            <!-- Main Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Column - Projects -->
+                <div class="lg:col-span-2">
+                    <div class="glass-card p-6">
+                        <div class="flex items-center justify-between mb-6 mobile-projects-header">
+                            <h2 class="text-2xl font-bold text-gray-800">
+                                🎯 Progetti
+                            </h2>
+                            <button onclick="addNewProject()" class="btn-primary">
+                                <i class="fas fa-plus mr-2"></i>
+                                Nuovo Progetto
+                            </button>
+                        </div>
+                        
+                        <div id="projects-container" class="space-y-6">
+                            <!-- Projects will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Analytics -->
+                <div class="lg:col-span-1">
+                    <div class="space-y-6 mobile-analytics">
+                        <!-- Revenue Card -->
+                        <div class="glass-card p-6 gradient-success text-white">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold mb-2">💰 Fatturato Totale</h3>
+                                    <p id="total-revenue" class="text-3xl font-bold">€0</p>
+                                    <p class="text-sm opacity-90 mt-2">
+                                        <span id="completed-tasks">0</span> task completati
+                                    </p>
+                                </div>
+                                <div class="text-4xl opacity-80 mobile-hide-small">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="glass-card p-6 cursor-pointer" onclick="toggleProgressExpansion()">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                                🏆 Obiettivi di Fatturato
+                                <span class="text-sm font-normal text-gray-500 ml-2">(tocca per espandere)</span>
+                            </h3>
+                            
+                            <!-- Vista compatta -->
+                            <div id="progress-compact" class="space-y-4">
+                                <div class="flex justify-between text-sm font-semibold">
+                                    <span class="text-gray-600">🎯 Prossimo Obiettivo</span>
+                                    <span id="current-milestone-target" class="text-blue-600">€1,000</span>
+                                </div>
+                                <div class="relative">
+                                    <div class="w-full bg-gray-200 rounded-full h-3">
+                                        <div id="milestone-progress-bar" class="progress-bar h-3 rounded-full" style="width: 0%">
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-xs font-bold text-gray-700">
+                                        <span id="milestone-progress-text">€0 / €1,000</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-500 font-medium">
+                                    <span>🚀 Inizio</span>
+                                    <span id="current-milestone-name">Primo Obiettivo</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Vista espansa -->
+                            <div id="progress-expanded" class="hidden space-y-4">
+                                <div class="space-y-3" id="milestones-container">
+                                    <!-- Le milestone verranno generate dinamicamente -->
+                                </div>
+                                <div class="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                                    <div class="text-sm font-bold text-gray-800 mb-3">📊 Statistiche</div>
+                                    <div class="grid grid-cols-2 gap-4 text-sm">
+                                        <div class="text-center">
+                                            <span class="text-gray-700">Completati</span>
+                                            <div id="completed-milestones" class="text-2xl font-bold text-green-600">0</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <span class="text-gray-700">Mancanti</span>
+                                            <div id="remaining-to-next" class="text-2xl font-bold text-blue-600">€1,000</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Cards -->
+                        <div class="grid grid-cols-2 gap-4 mobile-stats-cards">
+                            <!-- Active Projects -->
+                            <div class="glass-card p-5 text-center gradient-primary text-white">
+                                <div class="text-2xl mb-2">
+                                    <i class="fas fa-rocket"></i>
+                                </div>
+                                <p id="active-projects" class="text-2xl font-bold">0</p>
+                                <p class="text-sm opacity-90">Progetti Attivi</p>
+                            </div>
+
+                            <!-- Completed Projects -->
+                            <div class="glass-card p-5 text-center gradient-success text-white">
+                                <div class="text-2xl mb-2">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <p id="completed-projects" class="text-2xl font-bold">0</p>
+                                <p class="text-sm opacity-90">Completati</p>
+                            </div>
+                        </div>
+
+                        <!-- Average Revenue Card -->
+                        <div class="glass-card p-6 gradient-warning text-white">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold mb-2">📈 Media per Progetto</h3>
+                                    <p id="avg-revenue" class="text-2xl font-bold">€0</p>
+                                </div>
+                                <div class="text-3xl opacity-80 mobile-hide-small">
+                                    <i class="fas fa-calculator"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="glass-card p-6 gradient-purple text-white">
+                            <h3 class="text-lg font-bold mb-4">
+                                📊 Statistiche
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm opacity-90">Task Completati</span>
+                                    <span id="total-completed" class="text-lg font-bold">0</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm opacity-90">Tasso Completamento</span>
+                                    <span id="efficiency" class="text-lg font-bold">0%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm opacity-90">Task Totali</span>
+                                    <span id="total-tasks" class="text-lg font-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="glass-card p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                                ⚡ Attività Recenti
+                            </h3>
+                            <div id="recent-activity" class="space-y-3">
+                                <p class="text-gray-500 text-sm text-center py-4">Nessuna attività recente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding new project -->
+    <div id="project-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+        <div class="glass-card p-8 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto mobile-modal">
+            <h3 class="text-2xl font-bold mb-6 text-gray-800">
+                ✨ Nuovo Progetto
+            </h3>
+            <form id="project-form">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">🎯 Titolo Progetto</label>
+                        <input type="text" id="project-title" class="w-full px-4 py-3 custom-input text-gray-800" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">💰 Pagamento Cliente (€)</label>
+                        <input type="number" id="project-payment" value="100" class="w-full px-4 py-3 custom-input text-gray-800" required oninput="updateAllTaskValues()">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">📝 Descrizione</label>
+                        <textarea id="project-description" class="w-full px-4 py-3 custom-input text-gray-800" rows="3"></textarea>
+                    </div>
+                    
+                    <!-- Sezione Task -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <label class="block text-sm font-semibold text-gray-700">📋 Task del Progetto</label>
+                            <button type="button" onclick="addTaskToModal()" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                                <i class="fas fa-plus mr-1"></i>
+                                Aggiungi Task
+                            </button>
+                        </div>
+                        <div id="modal-tasks-container" class="space-y-3 max-h-48 overflow-y-auto">
+                            <!-- Task precompilati verranno aggiunti qui -->
+                        </div>
+                        <p class="text-xs text-gray-500 mt-4">I valori vengono distribuiti automaticamente</p>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4 mt-8">
+                    <button type="button" onclick="closeModal()" class="flex-1 px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 font-semibold">
+                        Annulla
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary">
+                        Crea Progetto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
