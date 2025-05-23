@@ -424,7 +424,6 @@ function updateMilestoneProgress(totalRevenue) {
     const requiredElements = [
         'current-milestone-target',
         'current-milestone-name', 
-        'current-milestone-icon',
         'milestone-progress-text',
         'milestone-progress-bar',
         'completed-milestones',
@@ -453,7 +452,6 @@ function updateMilestoneProgress(totalRevenue) {
     // Aggiorna vista compatta con controlli sicuri
     const targetElement = document.getElementById('current-milestone-target');
     const nameElement = document.getElementById('current-milestone-name');
-    const iconElement = document.getElementById('current-milestone-icon');
     const progressTextElement = document.getElementById('milestone-progress-text');
     const progressBarElement = document.getElementById('milestone-progress-bar');
     const completedElement = document.getElementById('completed-milestones');
@@ -461,12 +459,11 @@ function updateMilestoneProgress(totalRevenue) {
     
     if (targetElement) targetElement.textContent = `€${currentMilestone.target.toLocaleString()}`;
     if (nameElement) nameElement.textContent = currentMilestone.name;
-    if (iconElement) iconElement.textContent = currentMilestone.icon;
     if (progressTextElement) progressTextElement.textContent = `€${totalRevenue.toLocaleString()} / €${currentMilestone.target.toLocaleString()}`;
     
     if (progressBarElement) {
         progressBarElement.style.width = `${progressPercentage}%`;
-        progressBarElement.className = `bg-gradient-to-r ${currentMilestone.color} h-4 rounded-full transition-all duration-800 flex items-center justify-end pr-2`;
+        progressBarElement.className = `bg-gradient-to-r ${currentMilestone.color} h-3 rounded-full transition-all duration-800 flex items-center justify-end pr-2`;
     }
     
     // Aggiorna statistiche
